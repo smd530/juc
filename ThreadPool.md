@@ -104,6 +104,43 @@ public ThreadPoolExecutor(int corePoolSize,
 
 ![](http://img.tomato530.com/NotExecutors.png)
 
+```java
+public static void initPool() {
+        //    Executors 线程池工具类
+        // 一池五个线程 固定线程数
+//        ExecutorService threadPool = Executors.newFixedThreadPool(5);
+//
+//        // 一池一个工作线程
+//        ExecutorService threadPool2 = Executors.newSingleThreadExecutor();
+//
+//        // 一池N线程
+//        ExecutorService threadPool3 = Executors.newCachedThreadPool();
+
+        ExecutorService threadPool = new ThreadPoolExecutor(2, 5, 2L,
+                TimeUnit.SECONDS, new LinkedBlockingDeque<>(3),
+                Executors.defaultThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
+
+        // 拒绝策略 挨个试
+        //ThreadPoolExecutor.AbortPolicy 默认
+        //ThreadPoolExecutor.CallerRunsPolicy
+        //ThreadPoolExecutor.DiscardOldestPolicy
+        //ThreadPoolExecutor.DiscardPolicy
+        try {
+            for (int i = 0; i < 100; i++) {
+                threadPool.execute(() -> {
+                    System.out.println(Thread.currentThread().getName()+"\t线程工作");
+                });
+//                TimeUnit.MILLISECONDS.sleep(300);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            threadPool.shutdown();
+        }
+    }
+```
+
 ***
 
 线程池最大容纳数是 max + 队列数
