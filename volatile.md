@@ -1,6 +1,6 @@
 # Volatile
 
-volatile是JVM提供的轻量级的同步机制
+Volatile是JVM提供的轻量级的同步机制
 
 ***
 
@@ -34,4 +34,50 @@ volatile是JVM提供的轻量级的同步机制
      + 二是保证某些变量的内存可见性
 
      由于编译器和处理器都能执行指令重排优化 如果在指令间插入一条Memory Barrier则会告诉CPU和编译器 不管什么指令都不能和这条Memory Barrier指令重排序 **也就是说通过插入内存屏障禁止在内存屏障前后的指令执行重排序优化** 内存屏障的另一个作用是强制刷出各种CPU的缓存数据 因此CPU上的线程都能读到这些数据的最新版本
+     
+     store load
+
+***
+
+**Volatile的使用**
+
+```java
+/**
+ * 单例
+ *
+ * @author shanmingda
+ * @date 2020-10-15 16:37
+ */
+public class SingletonDemo {
+
+    private static volatile SingletonDemo instance = null;
+
+    private SingletonDemo() {
+        System.out.println(Thread.currentThread().getName()+"\tI am 构造方法");
+    }
+
+    // DCL （Double check Lock 双端检索机制）
+    public static SingletonDemo getInstance() {
+        if (instance == null) {
+
+            synchronized (SingletonDemo.class) {
+                if (instance == null) {
+                    instance = new SingletonDemo();
+                }
+            }
+        }
+        return instance;
+    }
+    public static void main(String[] args) {
+//        System.out.println(SingletonDemo.getInstance() == SingletonDemo.getInstance());
+
+
+        for (int i = 0; i < 100; i++) {
+            new Thread(() -> {
+                SingletonDemo.getInstance();
+            }, String.valueOf(i)).start();
+        }
+    }
+}
+```
 
